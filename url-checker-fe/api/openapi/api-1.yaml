@@ -1,0 +1,302 @@
+openapi: 3.0.0
+paths:
+  /api/jobs:
+    post:
+      operationId: JobsController_createJob
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateJobDto"
+      responses:
+        "201":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateJobResponseDto"
+        "400":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationErrorResponseDto"
+      summary: Create a new URL checking job
+      tags: &a1
+        - jobs
+    get:
+      operationId: JobsController_getJobs
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/JobSummaryDto"
+      summary: List all URL checking jobs
+      tags: *a1
+  /api/jobs/{id}:
+    get:
+      operationId: JobsController_getJobById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: Job identifier
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobDetailDto"
+        "404":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseDto"
+      summary: Get a job by identifier
+      tags: *a1
+    delete:
+      operationId: JobsController_cancelJob
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: Job identifier
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobDetailDto"
+        "404":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundErrorResponseDto"
+      summary: Cancel a job by identifier
+      tags: *a1
+info:
+  title: title
+  description: API docs for title
+  version: "1.0"
+  contact: {}
+tags: []
+servers: []
+components:
+  securitySchemes:
+    access-token:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
+  schemas:
+    CreateJobDto:
+      type: object
+      properties:
+        urls:
+          type: array
+          description: urls
+          example:
+            - https://example.com
+            - https://openai.com
+          minItems: 1
+          items:
+            type: string
+            format: uri
+            example: https://example.com
+      required:
+        - urls
+    CreateJobResponseDto:
+      type: object
+      properties:
+        jobId:
+          type: string
+          example: 123e4567-e89b-12d3-a456-426614174000
+          description: Created job identifier
+      required:
+        - jobId
+    ValidationErrorResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+          example: 400
+        message:
+          example:
+            - urls should not be empty
+            - each value in urls must be a URL address
+          type: array
+          items:
+            type: string
+        error:
+          type: string
+          example: Bad Request
+      required:
+        - statusCode
+        - message
+        - error
+    JobSummaryDto:
+      type: object
+      properties:
+        total:
+          type: number
+          example: 3
+        success:
+          type: number
+          example: 2
+        error:
+          type: number
+          example: 1
+        pending:
+          type: number
+          example: 0
+        inProgress:
+          type: number
+          example: 0
+        cancelled:
+          type: number
+          example: 0
+        id:
+          type: string
+          example: 123e4567-e89b-12d3-a456-426614174000
+        createdAt:
+          type: string
+          example: 2026-06-23T10:00:00.000Z
+        status:
+          type: string
+          enum: &a2
+            - pending
+            - in_progress
+            - completed
+            - cancelled
+            - failed
+          example: completed
+      required:
+        - total
+        - success
+        - error
+        - pending
+        - inProgress
+        - cancelled
+        - id
+        - createdAt
+        - status
+    UrlCheckResultDto:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 123e4567-e89b-12d3-a456-426614174001
+        url:
+          type: string
+          example: https://example.com
+        status:
+          type: string
+          enum:
+            - pending
+            - in_progress
+            - success
+            - error
+            - cancelled
+          example: success
+        httpStatus:
+          type: number
+          example: 200
+          nullable: true
+          description: HTTP status returned by the HEAD request when available
+        error:
+          type: string
+          example: HTTP status 500
+          nullable: true
+          description: Error message for failed, cancelled or timed out checks
+        startedAt:
+          type: string
+          example: 2026-06-23T10:00:00.000Z
+          nullable: true
+        finishedAt:
+          type: string
+          example: 2026-06-23T10:00:01.123Z
+          nullable: true
+        durationMs:
+          type: number
+          example: 1123
+          nullable: true
+      required:
+        - id
+        - url
+        - status
+    JobDetailDto:
+      type: object
+      properties:
+        total:
+          type: number
+          example: 3
+        success:
+          type: number
+          example: 2
+        error:
+          type: number
+          example: 1
+        pending:
+          type: number
+          example: 0
+        inProgress:
+          type: number
+          example: 0
+        cancelled:
+          type: number
+          example: 0
+        id:
+          type: string
+          example: 123e4567-e89b-12d3-a456-426614174000
+        createdAt:
+          type: string
+          example: 2026-06-23T10:00:00.000Z
+        status:
+          type: string
+          enum: *a2
+          example: completed
+        urls:
+          type: array
+          items:
+            $ref: "#/components/schemas/UrlCheckResultDto"
+      required:
+        - total
+        - success
+        - error
+        - pending
+        - inProgress
+        - cancelled
+        - id
+        - createdAt
+        - status
+        - urls
+    NotFoundErrorResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+          example: 404
+        message:
+          type: string
+          example: Job 123e4567-e89b-12d3-a456-426614174000 not found
+        error:
+          type: string
+          example: Not Found
+      required:
+        - statusCode
+        - message
+        - error
