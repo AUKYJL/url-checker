@@ -5,7 +5,7 @@ import { JOB_STATUS, URL_CHECK_STATUS } from '../types/job.types';
 export class CreateJobResponseDto {
   @ApiProperty({
     example: '123e4567-e89b-12d3-a456-426614174000',
-    description: 'Created job identifier',
+    description: 'Идентификатор созданной задачи',
   })
   jobId: string;
 }
@@ -44,15 +44,16 @@ export class UrlCheckResultDto {
     example: 200,
     required: false,
     nullable: true,
-    description: 'HTTP status returned by the HEAD request when available',
+    description: 'HTTP-статус, полученный при HEAD-запросе, если он доступен',
   })
   httpStatus?: number;
 
   @ApiProperty({
-    example: 'HTTP status 500',
+    example: 'HTTP-статус 500',
     required: false,
     nullable: true,
-    description: 'Error message for failed, cancelled or timed out checks',
+    description:
+      'Текст ошибки для неуспешных, отменённых или завершившихся по таймауту проверок',
   })
   error?: string;
 

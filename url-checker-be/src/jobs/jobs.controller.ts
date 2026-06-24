@@ -29,7 +29,7 @@ export class JobsController {
   constructor(private readonly jobsService: JobsService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create a new URL checking job' })
+  @ApiOperation({ summary: 'Создать новую задачу проверки URL' })
   @ApiBody({ type: CreateJobDto })
   @ApiCreatedResponse({ type: CreateJobResponseDto })
   @ApiBadRequestResponse({ type: ValidationErrorResponseDto })
@@ -38,15 +38,15 @@ export class JobsController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'List all URL checking jobs' })
+  @ApiOperation({ summary: 'Получить список всех задач проверки URL' })
   @ApiOkResponse({ type: JobSummaryDto, isArray: true })
   getJobs() {
     return this.jobsService.getJobs();
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get a job by identifier' })
-  @ApiParam({ name: 'id', description: 'Job identifier' })
+  @ApiOperation({ summary: 'Получить задачу по идентификатору' })
+  @ApiParam({ name: 'id', description: 'Идентификатор задачи' })
   @ApiOkResponse({ type: JobDetailDto })
   @ApiNotFoundResponse({ type: NotFoundErrorResponseDto })
   getJobById(@Param('id') id: string) {
@@ -54,8 +54,8 @@ export class JobsController {
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Cancel a job by identifier' })
-  @ApiParam({ name: 'id', description: 'Job identifier' })
+  @ApiOperation({ summary: 'Отменить задачу по идентификатору' })
+  @ApiParam({ name: 'id', description: 'Идентификатор задачи' })
   @ApiOkResponse({ type: JobDetailDto })
   @ApiNotFoundResponse({ type: NotFoundErrorResponseDto })
   cancelJob(@Param('id') id: string) {

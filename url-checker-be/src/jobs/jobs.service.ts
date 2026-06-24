@@ -1,4 +1,6 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
+
+import { createJobNotFoundException } from '@/shared/http/httpResponseTexts';
 
 import { CreateJobDto } from './dto/createJob.dto';
 import { JobsProcessor } from './jobs.processor';
@@ -46,7 +48,7 @@ export class JobsService {
     const job = this.jobsStore.findById(id);
 
     if (!job) {
-      throw new NotFoundException(`Job ${id} not found`);
+      throw createJobNotFoundException(id);
     }
 
     return this.toJobDetail(job);
@@ -56,7 +58,7 @@ export class JobsService {
     const existingJob = this.jobsStore.findById(id);
 
     if (!existingJob) {
-      throw new NotFoundException(`Job ${id} not found`);
+      throw createJobNotFoundException(id);
     }
 
     if (
@@ -70,7 +72,7 @@ export class JobsService {
     const cancelledJob = this.jobsStore.cancel(id);
 
     if (!cancelledJob) {
-      throw new NotFoundException(`Job ${id} not found`);
+      throw createJobNotFoundException(id);
     }
 
     this.jobsProcessor.cancel(id);

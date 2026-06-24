@@ -6,6 +6,7 @@ import { Response } from 'express';
 import * as YAML from 'yaml';
 
 import { AppModule } from './app.module';
+import { createValidationException } from './shared/http/httpResponseTexts';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -16,18 +17,18 @@ async function bootstrap() {
       whitelist: true,
       forbidNonWhitelisted: true,
       transform: true,
+      exceptionFactory: createValidationException,
     }),
   );
 
   const config = new DocumentBuilder()
-    .setTitle('title')
-    .setDescription('API docs for title')
+    .setTitle('API сервиса проверки URL')
+    .setDescription('Документация API сервиса проверки URL')
     .setVersion('1.0')
     .addBearerAuth(
       { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
       'access-token',
     )
-
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
@@ -40,4 +41,4 @@ async function bootstrap() {
   const port = configService.get<number>('PORT') ?? 5001;
   await app.listen(port);
 }
-bootstrap();
+void bootstrap();

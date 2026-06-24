@@ -144,7 +144,7 @@ export class JobsProcessor {
 
       if (!response.ok) {
         finalStatus = URL_CHECK_STATUS.ERROR;
-        error = `HTTP status ${response.status}`;
+        error = `HTTP-статус ${response.status}`;
       }
     } catch (caughtError) {
       const isCancelled = this.isJobCancellation(
@@ -222,17 +222,17 @@ export class JobsProcessor {
     options: { cancelled: boolean; timedOut: boolean },
   ): string {
     if (options.cancelled) {
-      return 'Cancelled';
+      return 'Отменено';
     }
 
     if (options.timedOut) {
-      return 'Request timed out';
+      return 'Время ожидания запроса истекло';
     }
 
     if (error instanceof Error) {
       return error.message;
     }
 
-    return 'Unknown error';
+    return 'Неизвестная ошибка';
   }
 }

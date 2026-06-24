@@ -5,11 +5,11 @@ export class NotFoundErrorResponseDto {
   statusCode: number;
 
   @ApiProperty({
-    example: 'Job 123e4567-e89b-12d3-a456-426614174000 not found',
+    example: 'Задача 123e4567-e89b-12d3-a456-426614174000 не найдена',
   })
   message: string;
 
-  @ApiProperty({ example: 'Not Found' })
+  @ApiProperty({ example: 'Не найдено' })
   error: string;
 }
 
@@ -19,13 +19,13 @@ export class ValidationErrorResponseDto {
 
   @ApiProperty({
     example: [
-      'urls should not be empty',
-      'each value in urls must be a URL address',
+      'Список urls не должен быть пустым',
+      'Каждое значение в urls должно быть корректным URL-адресом с http или https',
     ],
     type: [String],
   })
   message: string[];
 
-  @ApiProperty({ example: 'Bad Request' })
+  @ApiProperty({ example: 'Некорректный запрос' })
   error: string;
 }

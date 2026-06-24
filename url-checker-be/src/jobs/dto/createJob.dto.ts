@@ -3,7 +3,7 @@ import { ArrayNotEmpty, IsArray, IsString, IsUrl } from 'class-validator';
 
 export class CreateJobDto {
   @ApiProperty({
-    description: 'urls',
+    description: 'Список URL-адресов для проверки',
     example: ['https://example.com', 'https://openai.com'],
     type: 'array',
     minItems: 1,
@@ -13,15 +13,22 @@ export class CreateJobDto {
       example: 'https://example.com',
     },
   })
-  @IsArray()
-  @ArrayNotEmpty()
-  @IsString({ each: true })
+  @IsArray({ message: 'Поле urls должно быть массивом URL-адресов' })
+  @ArrayNotEmpty({ message: 'Список urls не должен быть пустым' })
+  @IsString({
+    each: true,
+    message: 'Каждое значение в urls должно быть строкой',
+  })
   @IsUrl(
     {
       protocols: ['http', 'https'],
       require_protocol: true,
     },
-    { each: true },
+    {
+      each: true,
+      message:
+        'Каждое значение в urls должно быть корректным URL-адресом с http или https',
+    },
   )
   urls!: string[];
 }
