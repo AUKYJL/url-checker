@@ -10,9 +10,9 @@ export const HTTP_ERROR_TEXT = {
   notFound: 'Не найдено',
 } as const;
 
-export function createValidationException(
+export const createValidationException = (
   validationErrors: ValidationError[],
-): BadRequestException {
+): BadRequestException => {
   return new BadRequestException({
     statusCode: HttpStatus.BAD_REQUEST,
     message: validationErrors.flatMap((error) =>
@@ -20,12 +20,12 @@ export function createValidationException(
     ),
     error: HTTP_ERROR_TEXT.badRequest,
   });
-}
+};
 
-export function createJobNotFoundException(id: string): NotFoundException {
+export const createJobNotFoundException = (id: string): NotFoundException => {
   return new NotFoundException({
     statusCode: HttpStatus.NOT_FOUND,
     message: `Задача ${id} не найдена`,
     error: HTTP_ERROR_TEXT.notFound,
   });
-}
+};
