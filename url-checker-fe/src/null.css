@@ -2,7 +2,6 @@
 *:before,
 *:after {
   box-sizing: border-box;
-  user-select: none;
 }
 :focus,
 :active {
@@ -33,12 +32,12 @@ img {
   vertical-align: top;
 }
 
-input[type="number"] {
+input[type='number'] {
   -moz-appearance: textfield; /* Для Firefox */
 }
 
-input[type="number"]::-webkit-outer-spin-button,
-input[type="number"]::-webkit-inner-spin-button {
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
   -webkit-appearance: none; /* Для Chrome, Safari, Edge */
   margin: 0;
 }
