@@ -2,27 +2,22 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useRef } from 'react';
 
 import type { JobDetail } from '../model';
-import { isTerminalJobStatus, jobQueryKeys } from '../model';
+import { hasUnfinishedUrls, jobQueryKeys } from '../model';
 
 export const useInvalidateJobsOnCompletion = (
-  status: JobDetail['status'] | undefined,
+  urls: JobDetail['urls'] | undefined,
 ): void => {
   const queryClient = useQueryClient();
-  const previousActiveJobStatusRef = useRef<JobDetail['status'] | null>(null);
+  const previousHasUnfinishedUrlsRef = useRef(false);
 
   useEffect(() => {
-    const currentStatus = status ?? null;
-    const previousStatus = previousActiveJobStatusRef.current;
+    const currentHasUnfinishedUrls = hasUnfinishedUrls(urls);
+    const previousHasUnfinishedUrls = previousHasUnfinishedUrlsRef.current;
 
-    if (
-      currentStatus &&
-      isTerminalJobStatus(currentStatus) &&
-      previousStatus &&
-      !isTerminalJobStatus(previousStatus)
-    ) {
+    if (previousHasUnfinishedUrls && !currentHasUnfinishedUrls) {
       queryClient.invalidateQueries({ queryKey: jobQueryKeys.list() });
     }
 
-    previousActiveJobStatusRef.current = currentStatus;
-  }, [queryClient, status]);
+    previousHasUnfinishedUrlsRef.current = currentHasUnfinishedUrls;
+  }, [queryClient, urls]);
 };

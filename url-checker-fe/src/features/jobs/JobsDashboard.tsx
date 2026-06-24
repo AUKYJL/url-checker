@@ -6,8 +6,8 @@ import { $api } from '@/shared/api/apiInstance';
 import { useInvalidateJobsOnCompletion, useSyncActiveJob } from './hooks';
 import type { JobSummary } from './model';
 import {
+  hasUnfinishedUrls,
   isRunningJobStatus,
-  isTerminalJobStatus,
   jobQueryKeys,
   jobQueryOptions,
   useJobsStore,
@@ -22,28 +22,31 @@ export const JobsDashboard = () => {
   const setActiveJobId = useJobsStore((s) => s.setActiveJobId);
   const [draftUrls, setDraftUrls] = useState('');
 
-  const jobsQuery = useQuery({
-    ...jobQueryOptions.list(),
-    refetchInterval: (query) => {
-      const data = query.state.data ?? [];
-      const JOBS_POLLING_INTERVAL_MS = 3000;
-
-      return data.some((job) => isRunningJobStatus(job.status))
-        ? JOBS_POLLING_INTERVAL_MS
-        : false;
-    },
-  });
-
   const activeJobQuery = useQuery({
     ...jobQueryOptions.detail(activeJobId ?? ''),
     enabled: Boolean(activeJobId),
     refetchInterval: (query) => {
       const data = query.state.data;
       const ACTIVE_JOB_POLLING_INTERVAL_MS = 1200;
+      const shouldStopPolling = data && !hasUnfinishedUrls(data.urls);
 
-      return data && isTerminalJobStatus(data.status)
-        ? false
-        : ACTIVE_JOB_POLLING_INTERVAL_MS;
+      return shouldStopPolling ? false : ACTIVE_JOB_POLLING_INTERVAL_MS;
+    },
+  });
+
+  const jobsQuery = useQuery({
+    ...jobQueryOptions.list(),
+    refetchInterval: (query) => {
+      const data = query.state.data ?? [];
+      const JOBS_POLLING_INTERVAL_MS = 3000;
+      const hasActiveJobWithUnfinishedUrls = hasUnfinishedUrls(
+        activeJobQuery.data?.urls,
+      );
+      const shouldPollJobs =
+        data.some((job) => isRunningJobStatus(job.status)) ||
+        hasActiveJobWithUnfinishedUrls;
+
+      return shouldPollJobs ? JOBS_POLLING_INTERVAL_MS : false;
     },
   });
 
@@ -68,7 +71,7 @@ export const JobsDashboard = () => {
 
   const jobs = jobsQuery.data ?? EMPTY_JOBS;
 
-  useInvalidateJobsOnCompletion(activeJobQuery.data?.status);
+  useInvalidateJobsOnCompletion(activeJobQuery.data?.urls);
   useSyncActiveJob({ jobs, activeJobId, setActiveJobId });
 
   const handleSelectJob = (jobId: string) => {

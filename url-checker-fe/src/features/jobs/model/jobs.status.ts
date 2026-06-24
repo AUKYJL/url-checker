@@ -27,6 +27,11 @@ export const RUNNING_JOB_STATUSES = new Set<JobStatus>([
   'in_progress',
 ]);
 
+export const UNFINISHED_URL_STATUSES = new Set<UrlCheckStatus>([
+  'pending',
+  'in_progress',
+]);
+
 export const JOB_STATUS_BADGE_CLASS_NAMES: Record<JobStatus, string> = {
   pending: 'border-border bg-muted text-muted-foreground',
   in_progress: 'border-primary/20 bg-primary/10 text-primary',
@@ -61,6 +66,16 @@ export const isTerminalJobStatus = (status: JobStatus) => {
 
 export const isRunningJobStatus = (status: JobStatus) => {
   return RUNNING_JOB_STATUSES.has(status);
+};
+
+export const isUnfinishedUrlStatus = (status: UrlCheckStatus) => {
+  return UNFINISHED_URL_STATUSES.has(status);
+};
+
+export const hasUnfinishedUrls = (
+  urls: Array<{ status: UrlCheckStatus }> | undefined,
+) => {
+  return urls?.some((url) => isUnfinishedUrlStatus(url.status)) ?? false;
 };
 
 export const canCancelJob = (status: JobStatus) => {
