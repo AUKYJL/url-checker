@@ -64,13 +64,7 @@ export class JobsProcessor {
   }
 
   cancel(jobId: string): void {
-    const controllers = this.activeControllers.get(jobId);
-
-    if (!controllers) {
-      return;
-    }
-
-    controllers.forEach((controller) => controller.abort());
+    this.activeControllers.delete(jobId);
   }
 
   private async runWorker(
@@ -147,19 +141,8 @@ export class JobsProcessor {
         error = `HTTP-статус ${response.status}`;
       }
     } catch (caughtError) {
-      const isCancelled = this.isJobCancellation(
-        job.id,
-        controller.signal,
-        timedOut,
-        caughtError,
-      );
-      finalStatus = isCancelled
-        ? URL_CHECK_STATUS.CANCELLED
-        : URL_CHECK_STATUS.ERROR;
-      error = this.getErrorMessage(caughtError, {
-        cancelled: isCancelled,
-        timedOut,
-      });
+      finalStatus = URL_CHECK_STATUS.ERROR;
+      error = this.getErrorMessage(caughtError, timedOut);
     } finally {
       clearTimeout(timeoutId);
       jobControllers.delete(item.id);
@@ -181,51 +164,20 @@ export class JobsProcessor {
       return;
     }
 
-    const cancelledJob = currentJob.status === JOB_STATUS.CANCELLED;
     const finishedAt = new Date();
     const durationMs = finishedAt.getTime() - startedAt.getTime();
 
-    currentItem.status = cancelledJob
-      ? URL_CHECK_STATUS.CANCELLED
-      : finalStatus;
+    currentItem.status = finalStatus;
     currentItem.httpStatus = httpStatus;
-    currentItem.error = cancelledJob
-      ? (currentItem.error ?? URL_CHECK_STATUS.CANCELLED)
-      : error;
+    currentItem.error = error;
     currentItem.finishedAt = finishedAt.toISOString();
     currentItem.durationMs = durationMs;
 
     this.jobsStore.update(currentJob);
   }
 
-  private isJobCancellation(
-    jobId: string,
-    signal: AbortSignal,
-    timedOut: boolean,
-    error: unknown,
-  ): boolean {
+  private getErrorMessage(error: unknown, timedOut: boolean): string {
     if (timedOut) {
-      return false;
-    }
-
-    const job = this.jobsStore.findById(jobId);
-
-    return (
-      job?.status === JOB_STATUS.CANCELLED ||
-      signal.aborted ||
-      (error instanceof Error && error.name === 'AbortError')
-    );
-  }
-
-  private getErrorMessage(
-    error: unknown,
-    options: { cancelled: boolean; timedOut: boolean },
-  ): string {
-    if (options.cancelled) {
-      return 'Отменено';
-    }
-
-    if (options.timedOut) {
       return 'Время ожидания запроса истекло';
     }
 

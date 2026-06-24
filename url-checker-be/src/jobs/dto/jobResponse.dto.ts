@@ -53,7 +53,7 @@ export class UrlCheckResultDto {
     required: false,
     nullable: true,
     description:
-      'Текст ошибки для неуспешных, отменённых или завершившихся по таймауту проверок',
+      'Текст ошибки для неуспешных или завершившихся по таймауту проверок',
   })
   error?: string;
 
@@ -68,6 +68,7 @@ export class UrlCheckResultDto {
     example: '2026-06-23T10:00:01.123Z',
     required: false,
     nullable: true,
+    description: 'Время завершения фактически выполненной проверки',
   })
   finishedAt?: string;
 
@@ -75,6 +76,7 @@ export class UrlCheckResultDto {
     example: 1123,
     required: false,
     nullable: true,
+    description: 'Длительность фактически выполненной проверки в миллисекундах',
   })
   durationMs?: number;
 }

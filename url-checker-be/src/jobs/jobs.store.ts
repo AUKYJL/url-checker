@@ -8,11 +8,6 @@ const FINAL_JOB_STATUSES: JOB_STATUS[] = [
   JOB_STATUS.CANCELLED,
   JOB_STATUS.FAILED,
 ];
-const FINAL_URL_STATUSES: URL_CHECK_STATUS[] = [
-  URL_CHECK_STATUS.SUCCESS,
-  URL_CHECK_STATUS.ERROR,
-  URL_CHECK_STATUS.CANCELLED,
-];
 
 @Injectable()
 export class JobsStore {
@@ -61,7 +56,7 @@ export class JobsStore {
     job.status = JOB_STATUS.CANCELLED;
 
     job.urls.forEach((urlCheck) => {
-      if (!FINAL_URL_STATUSES.includes(urlCheck.status)) {
+      if (urlCheck.status === URL_CHECK_STATUS.PENDING) {
         urlCheck.status = URL_CHECK_STATUS.CANCELLED;
       }
     });
